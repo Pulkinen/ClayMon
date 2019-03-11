@@ -1,4 +1,8 @@
-import socket, json, sqlite3, threading, time, sys, shutil, os
+import json
+import socket
+import sqlite3
+import threading
+import time
 from datetime import datetime
 
 pollPeriod = 10
@@ -271,6 +275,106 @@ def SwitchHashrate():
     print(rigsToReset)
     for rig in rigsToReset:
         ResetRig(rig[0])
+
+def SwitchHashrate2():
+    # Сперва загружаем из файлика или БД табличку - воркер, юзер, айпи, порт
+    # Потом опрашиваем все машинки, спрашиваем конфиг у каждой. Узнаем на какого юзера она работает
+    # Потом пихаем в тасклист задачина перезагрузку машинок, которые работают не туда
+    # Получаем отчеты о выполнении тасков.
+    # По каждому успешному отчету снова проверяем конфиг. Если юзер не тот - пишем в консоль сообщение об ошибке, ждем сколько-нибудь, задачу вотчдогу повторяем, до бесконечности
+    # По неуспешным отчетам, то есть машинку перезагрузить не удалось - пишем в консоль сообщение об ошибке, ждем сколько-нибудь, задачу вотчдогу повторяем, до бесконечности
+    pass
+
+
+def getIncomingTaskList():
+    return []
+
+def prepareRigsList():
+    return {}
+
+def addToRebootQueue():
+    pass
+
+def updateRigsOnlineStatus(rigList):
+    pass
+
+def reportTask(rigNum, success):
+    pass
+
+def watchDog2(event_for_wait, event_for_set):
+    # Контролировать успешность перезагрузки, правильность конфига надо в SwitchAll, не здесь
+    # Нужно у каждой машинки вести свои тайминги на перезагрузку итд.
+    # И как-то сделать чтоб сперва пробовать перезагруить командой reboot.cmd, а если не получилось - ресетом на пин
+    rigList = prepareRigsList()
+    pocessingTasks = {}
+    i = 0
+    global HaveToExit, Stopped
+    while not HaveToExit:
+        event_for_wait.wait()
+        event_for_wait.clear()
+        i += 1
+        if Stopped:
+            printDbg(vrbMustPrint, datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"), "Watch dog is stopped")
+            event_for_set.set()
+            continue
+
+        # Освежаем текущее состояние ригов
+        updateRigsOnlineStatus(rigList)
+
+        # Получаем и обрабатываем новые задания на перезагрузку
+        incomingTaskList = getIncomingTaskList()
+        while incomingTaskList:
+            task = incomingTaskList.pop()
+            rigNum = task["Rig"]
+            if not rigNum in rigList:
+                continue
+            rig = rigList[rigNum]
+            if rig["Online"]:
+                rig["Waiting"] = "Offline"
+                rig["Timers"] = rig["ToOfflineTimeouts"][:]
+            else:
+                rig["Waiting"] = "Online"
+                rig["Timers"] = rig["ToOnlineTimeouts"][:]
+            addToRebootQueue(rigNum, rig)
+
+        # Уменьшаем таймеры и обрабатываем их истечение
+        for rigNum in rigList:
+            rig = rigList[rigNum]
+            # У ригов без цели таймеров нет, нам от них ничего не нужно
+            if not rig["Waiting"] in ("Online", "Offline"):
+                continue
+
+            # Мы ждали что он заработает и дождались? Ура, задача выполнена, рапортуем
+            if (rig["Waiting"] == "Online") and rig["Online"]:
+                rig["Waiting"] = "Nothing"
+                success = True
+                reportTask(rigNum, success)
+                continue
+
+            # Мы ждали чтобы он ушел в перезагрузку и дождались? Отлично, теперь надо пождать пока он запустится
+            if (rig["Waiting"] == "Offline") and not rig["Online"]:
+                rig["Waiting"] = "Offline"
+                rig["Timers"] = rig["ToOnlineTimeouts"][:]
+                continue
+
+            # Это сокращенная запись условия "Текущее состояние" != "Ожидаемое состояние"
+            assert(rig["Online"] != (rig["Waiting"] == "Online"))
+
+            # Мы чего-то ждали, но не дождались? Уменьшим таймер
+            rig["Timers"][0] -= pollPeriod
+
+            # Ой, мы ждали, ждали, и вышел таймаут?
+            if rig["Timers"][0] < 0:
+                rig["Timers"].pop(0)
+                # Если таймеры кончились, то увы, задачу выполнить не удалось, завершаем и рапортуем
+                if rig["Timers"] == []:
+                    rig["Waiting"] = "Nothing"
+                    fail = False
+                    reportTask(rigNum, fail)
+                # А если таймеры еще остались, то очередной пинок делаем, и ждем дальше (для этого уже все готово)
+                addToRebootQueue(rigNum, rig)
+
+        event_for_set.set()
 
 def watchDog(event_for_wait, event_for_set):
     i = 0

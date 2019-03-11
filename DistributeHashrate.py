@@ -31,7 +31,7 @@ def DoStep(id, state, actualChain, candidates):
     if accSum > bestSum:
         return state
 
-    if accSum > target - tol and accSum < bestSum:
+    if target - tol < accSum < bestSum:
         bestSum = accSum
         bestChain = actualChain.copy()
 #        for cand in candidates:
@@ -49,7 +49,7 @@ def DoStep(id, state, actualChain, candidates):
             candSum += candHash
     state["candSum"] = candSum
 
-    if cands == []:
+    if not cands:
         return state
 
     if accSum + candSum < target - tol:

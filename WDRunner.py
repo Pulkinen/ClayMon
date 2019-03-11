@@ -52,10 +52,10 @@ def CheckConfigs(wrks):
         udata = data.decode("utf-8")
         try:
             resp = json.loads(udata)
-        rez = resp["result"]
-        conf = bytearray.fromhex(rez[1]).decode().split()
-        i1 = conf.index("-ewal")
-        i2 = conf.index("-epool")
+            rez = resp["result"]
+            conf = bytearray.fromhex(rez[1]).decode().split()
+            i1 = conf.index("-ewal")
+            i2 = conf.index("-epool")
         except:
             print("udata = ", udata)
             continue
@@ -69,7 +69,7 @@ def CheckConfigs(wrks):
         else:
             print(wname, "ewal =", conf[i1+1], "epool =", conf[i2+1])
 
-    return None
+        return None
 
 def UpdateGPU(data):
     gpu = data[0]
