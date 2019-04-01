@@ -4,8 +4,10 @@ import sqlite3
 import threading
 import time
 from datetime import datetime
+import sys
 
 pollPeriod = 10
+socketTimeout = 2
 RegCount = 12
 WaitingForBootUpTimeout = 400
 vrbDbg = 10
@@ -18,6 +20,9 @@ Stopped = False
 wd_ip = '192.168.2.55'
 wd_port = 7850
 dbRigs = {}
+SwitchQueue = []
+incomingTasksQueue = []
+Users = []
 
 def printDbg(verbosity, *args):
     if verbosity <= maxVerbosity:
@@ -106,7 +111,7 @@ def TempAddress(data):
 
 def CheckResetSuccess(rig):
     sock = socket.socket()
-    sock.settimeout(1.5)
+    sock.settimeout( socketTimeout )
     if not rig in dbRigs:
         printDbg(vrbMustPrint, "Cannot check, rig not found", rig)
         return True
@@ -276,24 +281,113 @@ def SwitchHashrate():
     for rig in rigsToReset:
         ResetRig(rig[0])
 
-def SwitchHashrate2():
+def SwitchHashrate2(filename = 'wrks.json'):
     # Сперва загружаем из файлика или БД табличку - воркер, юзер, айпи, порт
     # Потом опрашиваем все машинки, спрашиваем конфиг у каждой. Узнаем на какого юзера она работает
-    # Потом пихаем в тасклист задачина перезагрузку машинок, которые работают не туда
+    # Потом пихаем в тасклист задачи на перезагрузку машинок, которые работают не туда
     # Получаем отчеты о выполнении тасков.
     # По каждому успешному отчету снова проверяем конфиг. Если юзер не тот - пишем в консоль сообщение об ошибке, ждем сколько-нибудь, задачу вотчдогу повторяем, до бесконечности
     # По неуспешным отчетам, то есть машинку перезагрузить не удалось - пишем в консоль сообщение об ошибке, ждем сколько-нибудь, задачу вотчдогу повторяем, до бесконечности
-    pass
+    global SwitchQueue
+    global Users
+    f2 = open(filename, 'r')
+    st = f2.read()
+    ws = json.loads(st)
+    f2.close()
+    wrks = ws["Workers"]
+    Users = ws["Users"]
+    for wrk in wrks:
+        SwitchQueue.append(wrk)
+
+def checkWorkerConfig(udata, wrk):
+    if not udata:
+        return
+    i1, i2, i3 = None, None, None
+    try:
+        resp = json.loads(udata)
+        rez = resp["result"]
+        conf = bytearray.fromhex(rez[1]).decode().split()
+        i1 = conf.index("-ewal")
+        i2 = conf.index("-epool")
+        i3 = conf.index("-eworker")
+    except:
+        if not (i1 or i2):
+            return
+    remote_wal = conf[i1+1].upper()
+    remote_pool = conf[i2+1].upper()
+    remote_worker = None
+    if i3:
+        remote_worker = conf[i3+1].upper()
+    global Users
+    Users_dict = {u["Nick"] : u for u in Users}
+    uname = wrk["User"]
+    user = Users_dict[uname]
+    if remote_worker:
+        A = wrk["User"].upper()
+        B = remote_wal.upper()
+        if A in B:
+            return True
+    else:
+        try:
+            pool = user["pool"].upper()
+            wal = user["wallet"].upper()
+            if pool in remote_pool and wal in remote_wal:
+                return True
+        except:
+            return
+
+def retrieveWorkerConfig(wrk):
+    port = wrk["Port"]
+    ip = wrk["ip"]
+    buff = json.dumps(
+        {"id": 0, "jsonrpc": "2.0", "method": "miner_getfile", "params": ["config%s.txt" % wrk["letter"]]})
+    sock = socket.socket()
+    sock.settimeout(socketTimeout)
+    try:
+        sock.connect((ip, port))
+        sock.send(buff.encode('utf-8'))
+        data = sock.recv(5000)
+    except socket.error as msg:
+        sock.close()
+        return
+    udata = data.decode("utf-8")
+    return udata
+
+
+def SwitchHashrateThread(event_for_wait, event_for_set):
+    global HaveToExit, Stopped
+    global SwitchQueue
+    while not HaveToExit:
+        event_for_wait.wait()
+        event_for_wait.clear()
+        if Stopped:
+            event_for_set.set()
+            continue
+
+        switchCnt = 0
+        while switchCnt < (pollPeriod // socketTimeout) and SwitchQueue:
+            switchCnt += 1
+            wrk = SwitchQueue.pop()
+            udata = retrieveWorkerConfig(wrk)
+            if udata and checkWorkerConfig(udata, wrk): # Если воркер ответил, и конфиг в порядке - ничего не делаем, все отлично
+                continue
+            addToIncomingTask(wrk["RigNum"])
+        event_for_set.set()
+
+def addToIncomingTask(rigNum):
+    global incomingTasksQueue
+    task = {"Rig" : rigNum}
+    incomingTasksQueue.append(task)
 
 
 def getIncomingTaskList():
-    return []
+    global incomingTasksQueue
+    return incomingTasksQueue
 
 def prepareRigsList():
-    return {}
-
-def addToRebootQueue():
-    pass
+    # rig["ToOfflineTimeouts"][:]
+    rig = {"RigNum": 0, "ToOfflineTimeouts": [1,1,1], "ToOnlineTimeouts": [1,1,1], "OnlinePort": 3333, "ip": "192.168.2.100"}
+    return [rig]
 
 def updateRigsOnlineStatus(rigList):
     pass
@@ -301,13 +395,11 @@ def updateRigsOnlineStatus(rigList):
 def reportTask(rigNum, success):
     pass
 
-def watchDog2(event_for_wait, event_for_set):
+def RebootResetManagingThread(event_for_wait, event_for_set):
     # Контролировать успешность перезагрузки, правильность конфига надо в SwitchAll, не здесь
-    # Нужно у каждой машинки вести свои тайминги на перезагрузку итд.
-    # И как-то сделать чтоб сперва пробовать перезагруить командой reboot.cmd, а если не получилось - ресетом на пин
     rigList = prepareRigsList()
-    pocessingTasks = {}
     i = 0
+    rebootQueue = []
     global HaveToExit, Stopped
     while not HaveToExit:
         event_for_wait.wait()
@@ -332,10 +424,12 @@ def watchDog2(event_for_wait, event_for_set):
             if rig["Online"]:
                 rig["Waiting"] = "Offline"
                 rig["Timers"] = rig["ToOfflineTimeouts"][:]
+                rig["Action"] = "Reboot"
             else:
                 rig["Waiting"] = "Online"
                 rig["Timers"] = rig["ToOnlineTimeouts"][:]
-            addToRebootQueue(rigNum, rig)
+                rig["Action"] = "Reset"
+            rebootQueue.append(rig)
 
         # Уменьшаем таймеры и обрабатываем их истечение
         for rigNum in rigList:
@@ -353,7 +447,7 @@ def watchDog2(event_for_wait, event_for_set):
 
             # Мы ждали чтобы он ушел в перезагрузку и дождались? Отлично, теперь надо пождать пока он запустится
             if (rig["Waiting"] == "Offline") and not rig["Online"]:
-                rig["Waiting"] = "Offline"
+                rig["Waiting"] = "Online"
                 rig["Timers"] = rig["ToOnlineTimeouts"][:]
                 continue
 
@@ -366,15 +460,42 @@ def watchDog2(event_for_wait, event_for_set):
             # Ой, мы ждали, ждали, и вышел таймаут?
             if rig["Timers"][0] < 0:
                 rig["Timers"].pop(0)
-                # Если таймеры кончились, то увы, задачу выполнить не удалось, завершаем и рапортуем
-                if rig["Timers"] == []:
-                    rig["Waiting"] = "Nothing"
-                    fail = False
-                    reportTask(rigNum, fail)
-                # А если таймеры еще остались, то очередной пинок делаем, и ждем дальше (для этого уже все готово)
-                addToRebootQueue(rigNum, rig)
+                if rig["Timers"]:
+                    # А если таймеры еще остались, то очередной пинок делаем, и ждем дальше (для этого уже все готово)
+                    rebootQueue.append(rig)
+                # Если таймеры кончились, мы хотели чтоб машинка ушла в оффлайн, но она так и осталась онлайн, то пробуем ее ресетить
+                if rig["Waiting"] == "Offline":
+                    rig["Timers"] = rig["ToOfflineTimeouts"][:]
+                    rig["Action"] = "Reset"
+                    rebootQueue.append(rig)
+                rig["Waiting"] = "Nothing"
+                fail = False
+                reportTask(rigNum, fail)
+
+        rebootsCnt = 0
+        while rebootsCnt < (pollPeriod // socketTimeout) and rebootQueue:
+            rig = rebootQueue.pop()
+            action = rig["Action"]
+            if action == "Reboot":
+                RebootRig(rig)
+            elif action == "Reset":
+                pin = rig["Pin"]
+                ResetPin(pin)
+            rebootsCnt += 1
 
         event_for_set.set()
+
+def RebootRig(rig):
+    sock = socket.socket()
+    sock.settimeout( socketTimeout )
+    ip = rig["ip"]
+    port = rig["OnlinePort"]
+    try:
+        sock.connect((ip, port))
+        buff = json.dumps({"id": 0, "jsonrpc": "2.0", "method": "miner_reboot"})
+        sock.send(buff.encode('utf-8'))
+    finally:
+        sock.close()
 
 def watchDog(event_for_wait, event_for_set):
     i = 0
@@ -486,6 +607,9 @@ def LoadWorkersFromDB():
     conn.close()
     printDbg(vrbMustPrint, 'Workers loaded from db', len(ws))
     printDbg(vrbMustPrint, ws)
+
+# rez = checkWorkerConfig('{"id": 0, "result": ["config.txt", "2d6d6f646520310d0a2d6d706f727420333333330d0a2d6d696e73706565642031300d0a232d6469203031323334350d0a0d0a232d6d636c6f636b20323030302c20323030302c20323030302c20313930302c20323030302c20323030302c20323030302c20313835300d0a2d6d636c6f636b20323030302c20313935302c20313930302c20323035302c20323130302c20323130302c20202020302c20202020300d0a2d706f776c696d20202032352c20202032352c20202032352c20202032352c20202032352c20202032352c20202032352c20202020300d0a2d63766464632020313030302c20313035302c20203935302c20203935302c20203935302c20313030302c20202020302c20202020300d0a0d0a2d74742036350d0a2d7474646372203735200d0a2d74746c692038300d0a2d7473746172742035350d0a2d7473746f70203835200d0a2d65746869203136200d0a2d65706f6f6c206575726f7065312e657468657265756d2e6d696e696e67706f6f6c6875622e636f6d3a3230353335200d0a2d6577616c2070756c6b322e25434f4d50555445524e414d45250d0a2d65776f726b65722070756c6b322e25434f4d50555445524e414d45250d0a2d65736d20320d0a2d657073772078200d0a2d616c6c706f6f6c732031200d0a2d616c6c636f696e732031200d0a0d0a2d706c6174666f726d20310d0a2d6c6f67736d617873697a65203130"], "error": null}', wrk)
+# rez = checkWorkerConfig('{"id": 0, "error": null, "result": ["config.txt", "2d6d6f646520310d0a2d6d706f727420333333330d0a2d6d696e73706565642031300d0a232d6463726920390d0a0d0a232d6d636c6f636b20323135302c20323135302c20323135302c20323135302c20323135302c20323135302c20323135302c20323130300d0a2d706f776c696d20202020352c20202020352c20202020352c20202020352c20202020352c20202020352c20202020352c20202020350d0a2d63766464632020203930302c20203930302c20203930302c20203930302c20203930302c20203930302c20203930302c20203930300d0a0d0a2d74742036350d0a2d7474646372203730200d0a2d74746c692038300d0a2d7473746172742035350d0a2d7473746f70203835200d0a2d65746869203136200d0a2d65706f6f6c206574682d6575312e6e616e6f706f6f6c2e6f72673a393939390d0a2d6577616c203078396266343863353236323830653636353765356232626534616134383063663065306337373762342f25434f4d50555445524e414d45252f4d6f6f6e3537394079616e6465782e72750d0a2d657073772078200d0a2d616c6c706f6f6c732031200d0a2d616c6c636f696e732031200d0a0d0a2d64706f6f6c207374726174756d2b7463703a2f2f65752e7369616d696e696e672e636f6d3a373737370d0a2d6477616c20393936366531366331633966313736373437316463396438336564653938636562366433306139353135383461653565653561393065643139333363343539383861376637343132383637610d0a2d64636f696e2073630d0a2d6470737720780d0a0d0a2d706c6174666f726d20310d0a2d6c6f67736d617873697a65203130"]}', wrk)
 
 printDbg(vrbMustPrint, "===================================================", datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"), "Claymore monitor started. Version 0.01 ===================================================" )
 ws = []
