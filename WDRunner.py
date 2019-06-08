@@ -182,6 +182,23 @@ while 1==1:
         if len(inp) >= 2:
             period = int(inp[1])
         buff = json.dumps({"Command": "Report", "Data" : period})
+    elif command == "state":
+        ip = ClayMon_ip
+        port = ClayMon_port
+        buff = json.dumps({"Command": "State", "Data" : []})
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(10)
+        try:
+            sock.connect((ip, port))
+            sock.send(buff.encode('utf-8'))
+            data = sock.recv(10000)
+            udata = data.decode("utf-8")
+            print(udata)
+            continue
+        except:
+            print("Watchdog server script is offline")
+            continue
+
     else:
         print("Unknown command")
         continue

@@ -14,7 +14,7 @@ vrbDbg = 10
 vrbDbg2 = 8
 vrbPrintTimeStamps = 9
 vrbMustPrint = 0
-maxVerbosity = vrbDbg
+maxVerbosity = vrbPrintTimeStamps
 HaveToExit = False
 Stopped = False
 wd_ip = '192.168.2.55'
@@ -23,8 +23,6 @@ dbRigs = {}
 SwitchQueue = []
 incomingTasksQueue = []
 Users = []
-Rigs = []
-Workers = []
 
 def printDbg(verbosity, *args):
     if verbosity <= maxVerbosity:
@@ -76,7 +74,7 @@ def API(data):
             return
         elif command == "Switch":
             printDbg(vrbMustPrint, "Api switch")
-            SwitchHashrate()
+            SwitchHashrate2()
             return
         elif command == "TempPin":
             nums = packet["Data"]
@@ -269,20 +267,6 @@ def TestPort(prt):
         SendBytes(AllOnes)
     return
 
-def SwitchHashrate():
-    printDbg(vrbMustPrint, "Switch hashrate")
-    conn = sqlite3.connect('Claymon.sqlite')
-    cursor = conn.cursor()
-    sql = """
-        Select Distinct Rig from Workers 
-        Where Not (ActualUser = "pulk" or ActualUser = "Ipp")    
-    """
-    cur = cursor.execute(sql)
-    rigsToReset = cur.fetchall()
-    print(rigsToReset)
-    for rig in rigsToReset:
-        ResetRig(rig[0])
-
 def SwitchHashrate2(filename = 'wrks.json'):
     # Сперва загружаем из файлика или БД табличку - воркер, юзер, айпи, порт
     # Потом опрашиваем все машинки, спрашиваем конфиг у каждой. Узнаем на какого юзера она работает
@@ -355,13 +339,7 @@ def retrieveWorkerConfig(wrk):
     udata = data.decode("utf-8")
     return udata
 
-
 def SwitchHashrateThread(event_for_wait, event_for_set):
-    # TODO надо добавить логику проверки ответов от RebootManage
-    # Хотя если я не придумаю ничего умнее чем постоянно перезагружать
-    # То можно зашить эту логику прямо в RebootManage и не городить огород с проверкой рапортов
-    # А проще всего эту логику зашить вообще сверху. Время от времени слать команду Configs all
-    #  Если все в порядке - оно ничего делать и не будет
     global HaveToExit, Stopped
     global SwitchQueue
     while not HaveToExit:
@@ -386,23 +364,14 @@ def addToIncomingTask(rigNum):
     task = {"Rig" : rigNum}
     incomingTasksQueue.append(task)
 
-
 def getIncomingTaskList():
     global incomingTasksQueue
     return incomingTasksQueue
 
 def prepareRigsList():
-    f2 = open('workers-to-electric.json', 'r')
-    st = f2.read()
-    ws = json.loads(st)
-    f2.close()
-    global Users
-    global Rigs
-    global Workers
-    for rig in Rigs:
-        rig["Waiting"] = None
-
-    return Rigs
+    # rig["ToOfflineTimeouts"][:]
+    rig = {"RigNum": 0, "ToOfflineTimeouts": [1,1,1], "ToOnlineTimeouts": [1,1,1], "OnlinePort": 3333, "ip": "192.168.2.100"}
+    return [rig]
 
 def updateRigsOnlineStatus(rigList):
     pass
@@ -420,7 +389,6 @@ def RebootResetManagingThread(event_for_wait, event_for_set):
         event_for_wait.wait()
         event_for_wait.clear()
         i += 1
-        printDbg(vrbDbg, 'RebootResetManagingThread', i)
         if Stopped:
             printDbg(vrbMustPrint, datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"), "Watch dog is stopped")
             event_for_set.set()
@@ -590,7 +558,7 @@ def delayThr( event_for_wait, event_for_set):
         event_for_wait.wait()
         event_for_wait.clear()
         printDbg(vrbDbg, datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"), "Delay 2")
-        sock.settimeout(socketTimeout)
+        sock.settimeout(pollPeriod)
         try:
             conn, addr = sock.accept()
             data = conn.recv(1000)
@@ -629,7 +597,7 @@ def LoadWorkersFromDB():
 
 printDbg(vrbMustPrint, "===================================================", datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"), "Claymore monitor started. Version 0.01 ===================================================" )
 ws = []
-# LoadWorkersFromDB()
+LoadWorkersFromDB()
 
 thrCnt = 2
 printDbg(vrbMustPrint, "pollPeriod = ", pollPeriod, "Threads count = ", thrCnt)
@@ -668,28 +636,9 @@ for i in range(thrCnt):
     e1 = e2
     e2 = events[i]
     if i == thrCnt-2:
-        threads.append(threading.Thread(target=RebootResetManagingThread, args=(e1, e2)))
+        threads.append(threading.Thread(target=watchDog, args=(e1, e2)))
     if i == thrCnt-1:
         threads.append(threading.Thread(target=delayThr, args=(e1, e2)))
 for i in range(thrCnt):
     threads[i].start()
 events[thrCnt-1].set()
-
-# threads = []
-# events = []
-# statspool = []
-# for i in range(thrCnt):
-#     events.append(threading.Event())
-# e2 = events[thrCnt-1]
-# for i in range(thrCnt):
-#     e1 = e2
-#     e2 = events[i]
-#     if i == thrCnt-2:
-#         threads.append(threading.Thread(target=SwitchHashrateThread, args=(e1, e2)))
-#     if i == thrCnt-2:
-#         threads.append(threading.Thread(target=watchDog, args=(e1, e2)))
-#     if i == thrCnt-1:
-#         threads.append(threading.Thread(target=delayThr, args=(e1, e2)))
-# for i in range(thrCnt):
-#     threads[i].start()
-# events[thrCnt-1].set()

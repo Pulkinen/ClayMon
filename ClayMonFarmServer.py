@@ -1,5 +1,6 @@
 import socket, json, sqlite3, threading, time, sys, shutil, os
 from datetime import datetime
+import copy
 
 pollPeriod = 10
 GlobalUptime = 0
@@ -50,6 +51,10 @@ def API(data):
             period = packet["Data"]
             UpdateLocalHistory()
             BuildMonitoringReport(period)
+        elif command == "State":
+            responce_buff = GetState()
+            printDbg(vrbDbg,'API, responce_buff: ', responce_buff)
+            return responce_buff
         else:
             printDbg(vrbMustPrint, "Unknown command = ", packet)
     except:
@@ -517,11 +522,12 @@ def pollStat (wrks, name, statspool, event_for_wait, event_for_set):
         printDbg(vrbMustPrint, 'Poll thread #', name, len(stats), 'total workers. Online:', online, 'Offline:', offline)
         printDbg(vrbDbg, datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"), "Poll 3", name)
         statspool.append(stats)
+        printDbg(vrbDbg, 'pollStat', statspool)
         event_for_set.set()
         printDbg(vrbDbg, datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"), "Poll 4", name)
 
 def pushStatToDB(workers, statspool, event_for_wait, event_for_set):
-    global HaveToExit, GlobalUptime
+    global HaveToExit, GlobalUptime, laststats
     while not HaveToExit:
         printDbg(vrbDbg, datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"), "Push 1")
         event_for_wait.wait()
@@ -531,6 +537,9 @@ def pushStatToDB(workers, statspool, event_for_wait, event_for_set):
         wrksOnline, gpuOnline = 0, 0
         wrksOffline = []
         TotalHashrate = 0
+        printDbg(vrbDbg, "----------------------------------------------------------------------")
+        printDbg(vrbDbg, 'pushStatToDB', statspool)
+        laststats = copy.deepcopy(statspool)
 
         while statspool:
             stats = statspool.pop()
@@ -612,7 +621,7 @@ def pushStatToDB(workers, statspool, event_for_wait, event_for_set):
         printDbg(vrbDbg, datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"), "Push 4")
 
 def delayThr( event_for_wait, event_for_set):
-    sock = socket.socket()
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind(("", 6111))
     sock.listen(1)
 
@@ -627,9 +636,13 @@ def delayThr( event_for_wait, event_for_set):
         try:
             conn, addr = sock.accept()
             data = conn.recv(1000)
-            conn.close()
             if data:
-                API(data)
+                responce_buff = API(data)
+            if data and responce_buff is not None:
+                printDbg(vrbDbg2, "Try to send response")
+                conn.send(responce_buff)
+                printDbg(vrbDbg2, "Response has sended")
+            conn.close()
         except socket.error as msg:
             printDbg(vrbDbg, "Nothing was recieved")
 
@@ -656,6 +669,13 @@ def LoadWorkersFromDB():
     conn.close()
     printDbg(vrbMustPrint, 'Workers loaded from db', len(ws))
     printDbg(vrbMustPrint, ws)
+
+def GetState():
+    printDbg(vrbDbg, "GetState")
+    global laststats
+    buff = json.dumps(laststats)
+    rez = buff.encode('utf-8')
+    return rez
 
 printDbg(vrbMustPrint, "===================================================", datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"), "Claymore monitor started. Version 0.01 ===================================================" )
 ws = []
@@ -689,6 +709,7 @@ thrCnt += 4
 threads = []
 events = []
 statspool = []
+laststats = []
 for i in range(thrCnt):
     events.append(threading.Event())
 e2 = events[thrCnt-1]
