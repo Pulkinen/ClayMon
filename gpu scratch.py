@@ -21,12 +21,12 @@ def build_gpu_list(base_folder):
             f = open(folder+'\\'+fname, 'r')
             st = f.readlines()
             f.close()
-            for s in st:
-                if not s.startswith('#'):
+            for s2 in st:
+                if not s2.startswith('#'):
                     continue
 #                print(s)
-                print(s, file=out_file2)
-                s = s[1:]
+                cnt = 0
+                s = s2[1:]
                 pairs = s.split(',')
 #                print(pairs)
                 for p in pairs:
@@ -41,7 +41,9 @@ def build_gpu_list(base_folder):
                     gpu = gpustr[3:]
                     bn = bnstr[2:]
                     print(gpu, mn, bn, file = out_file)
-
+                    cnt += 1
+                print(cnt, '   ', s2, file=out_file2, end='')
+        print('', file=out_file2)
 
 
 base_folder = r"C:\\tmp\\7777\\"
