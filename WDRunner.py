@@ -69,7 +69,7 @@ def CheckConfigs(wrks):
         else:
             print(wname, "ewal =", conf[i1+1], "epool =", conf[i2+1])
 
-        return None
+    return None
 
 def UpdateGPU(data):
     gpu = data[0]
@@ -109,7 +109,7 @@ def UpdateGPU(data):
 
 while 1==1:
     print("Watchdog API commands: Start, Stop, Exit, Rig [numbers], Pin [numbers], Test [number], Switch")
-    print("Additional commands : Configs [numbers|all], TempPin [pin, rig], UpdateGPU [gpu, rig, BN], UploadGPU [filename], Report [hours]")
+    print("Additional commands : Configs [numbers|all], CheckPins, TempPin [pin, rig], UpdateGPU [gpu, rig, BN], UploadGPU [filename], Report [hours]")
     print("Enter command")
     inp = input().split()
     command = inp[0].lower()
@@ -123,6 +123,8 @@ while 1==1:
         buff = json.dumps({"Command": "Stop"})
     elif command == "exit":
         buff = json.dumps({"Command": "Exit"})
+    elif command == "checkpins":
+        buff = json.dumps({"Command": "CheckPins"})
     elif command == "rig":
         rigs = inp[1:]
         if len(inp) < 2:
@@ -191,9 +193,12 @@ while 1==1:
         try:
             sock.connect((ip, port))
             sock.send(buff.encode('utf-8'))
-            data = sock.recv(10000)
+            data = sock.recv(100000)
             udata = data.decode("utf-8")
             print(udata)
+#            f4 = open('state.json', 'w')
+#            f4.write(udata)
+#            f4.close()
             continue
         except:
             print("Watchdog server script is offline")

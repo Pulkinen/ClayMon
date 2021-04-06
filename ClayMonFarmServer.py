@@ -1,6 +1,7 @@
 import socket, json, sqlite3, threading, time, sys, shutil, os
 from datetime import datetime
 import copy
+import random
 
 pollPeriod = 10
 GlobalUptime = 0
@@ -12,6 +13,10 @@ vrbPrintTimeStamps = 9
 vrbMustPrint = 0
 maxVerbosity = vrbDbg2
 HaveToExit = False
+
+uptime_id = random.randint(0, 10000000)
+server_start_time_str = datetime.strftime(datetime.now(), '%Y-%m-%d %H-%M-%S')
+
 
 def printDbg(verbosity, *args):
     if verbosity <= maxVerbosity:
@@ -465,8 +470,8 @@ def purgeLastDayStat(event_for_wait, event_for_set):
         if i%90 == 1:
             UpdateLocalHistory()
 
-        if i%1000 == 2:
-            FillAndCopyHistoryDB("")
+        # if i%1000 == 2:
+        #     FillAndCopyHistoryDB("")
 
         if i % 1000 == 0:
             printDbg(vrbMustPrint, "purge old stat in DB")
@@ -515,6 +520,10 @@ def pollStat (wrks, name, statspool, event_for_wait, event_for_set):
             sock.close()
             stats.append(stat)
 
+        nowstr = datetime.strftime(datetime.now(), '%Y-%m-%d %H-%M-%S')
+        meta = ["Meta", dict(uptime_id = uptime_id, ts = nowstr, start_time = server_start_time_str)]
+        stats.append(meta)
+
         printDbg(vrbDbg, datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"), "Poll 1", name)
         event_for_wait.wait()
         event_for_wait.clear()
@@ -528,6 +537,7 @@ def pollStat (wrks, name, statspool, event_for_wait, event_for_set):
 
 def pushStatToDB(workers, statspool, event_for_wait, event_for_set):
     global HaveToExit, GlobalUptime, laststats
+    local_stats = {}
     while not HaveToExit:
         printDbg(vrbDbg, datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"), "Push 1")
         event_for_wait.wait()
@@ -540,14 +550,35 @@ def pushStatToDB(workers, statspool, event_for_wait, event_for_set):
         printDbg(vrbDbg, "----------------------------------------------------------------------")
         printDbg(vrbDbg, 'pushStatToDB', statspool)
         laststats = copy.deepcopy(statspool)
+        nowstr = datetime.strftime(datetime.now(), '%Y-%m-%d %H-%M-%S')
+        local_stats[nowstr] = (copy.deepcopy(statspool))
+        if len(local_stats) >= 10:
+            fname = r"U:\logs\stat\%s.json" % nowstr
+            try:
+                buff = json.dumps(local_stats)
+                # rez = buff.encode('utf-8')
+                stat_file = open(fname, 'w')
+                stat_file.write(buff)
+                stat_file.close()
+                printDbg(vrbMustPrint, datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"), 'push stat to file %s successfully'%fname)
+            except Exception as e:
+                printDbg(vrbMustPrint, datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"), str(e))
+            local_stats = {}
 
         while statspool:
             stats = statspool.pop()
             for stat in stats:
+                if stat[0] == 'Meta':
+                    continue
                 tst = stat[1]
                 trz = None
                 if tst != None:
-                    trz = tst['result']
+                    try:
+                        trz = tst['result']
+                    except:
+                        printDbg(vrbMustPrint, '!!!!!!!!!!!!!!!!!!'+tst+'!!!!!!!!!!!!!!!!!!')
+                        trz = None
+                        
                 tm = datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S")
                 tm2 = round(time.time())
                 wrk = stat[0]
@@ -606,7 +637,7 @@ def pushStatToDB(workers, statspool, event_for_wait, event_for_set):
         st1 = (tm, tm2, 'Total', '', 0, 0, GlobalUptime, TotalHashrate, 0, 0, 0, 0)
         rez1.append(st1)
 
-        conn = sqlite3.connect('Claymon.sqlite')
+        conn = sqlite3.connect('Claymon.sqlite', timeout=30)
         conn.executemany('INSERT INTO LastDayWorkerEthStats (time, seconds, worker, ip, port, ClaymoreVer, Uptime, EthHashrate, Shares, Rejected, Invalid, PoolSwitches) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', rez1)
         conn.executemany('INSERT INTO LastDayGPUStats (time, seconds, worker, BusNum, State, EthHashrate, T, Fan, Accepted, Rejected, Invalid) VALUES (?,?,?,?,?,?,?,?,?,?,?)', rez2)
         conn.commit()
@@ -641,7 +672,7 @@ def delayThr( event_for_wait, event_for_set):
             if data and responce_buff is not None:
                 printDbg(vrbDbg2, "Try to send response")
                 conn.send(responce_buff)
-                printDbg(vrbDbg2, "Response has sended")
+                printDbg(vrbDbg2, "Response has sended", len(responce_buff))
             conn.close()
         except socket.error as msg:
             printDbg(vrbDbg, "Nothing was recieved")
@@ -673,6 +704,7 @@ def LoadWorkersFromDB():
 def GetState():
     printDbg(vrbDbg, "GetState")
     global laststats
+    printDbg(vrbMustPrint, "GetState", laststats)
     buff = json.dumps(laststats)
     rez = buff.encode('utf-8')
     return rez

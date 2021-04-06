@@ -1,159 +1,462 @@
 {
-	"Users": [{
-			"Name": "Mama",
-			"Nick": "Nazira",
-			"ContractHashrate": 174,
-			"Tolerance": 10
-		},
-		{
-			"Name": "Serega",
-			"Nick": "Ippolite",
-			"ContractHashrate": 280,
-			"Tolerance": 10
-		},
-		{
-			"Name": "Dinahr",
-			"Nick": "alivareev",
-			"ContractHashrate": 231,
-			"Tolerance": 5
-		},
-		{
-			"Name": "Volosevich Igor",
-			"Nick": "viv",
-			"ContractHashrate": 485,
-			"Tolerance": 5
-		},
-		{
-			"Name": "Azamat Makhmutov",
-			"Nick": "AzamatMakhmutov",
-			"ContractHashrate": 138,
-			"Tolerance": 1
-		},
-		{
-			"Name": "Yura",
-			"Nick": "yuri579",
-			"wallet": "0xe1170d0d70621c784848393ff4ebcb69fdadeaed",
-			"pool": "eth-eu1.nanopool.org:9999",
-			"ContractHashrate": 870,
-			"pass": "Moon579@yandex.ru",
-			"Tolerance": 1
-		},
-		{
-			"Name": "Timur Safin",
-			"Nick": "cynical2207",
-			"ContractHashrate": 158,
-			"Tolerance": 3
-		},
-		{
-			"Name": "Gulnaz Saiahova",
-			"Nick": "SayakhovaGF",
-			"ContractHashrate": 78,
-			"Tolerance": 3
-		},
-		{
-			"Name": "Aleksei Fuga",
-			"Nick": "alecsey",
-			"ContractHashrate": 78,
-			"Tolerance": 3
-		},
-		{
-			"Name": "Sania Valikov",
-			"Nick": "funny-grass",
-			"ContractHashrate": 97,
-			"Tolerance": 3
-		},
-		{
-			"Name": "Timur Saifullin",
-			"Nick": "TimSayfullin",
-			"ContractHashrate": 194,
-			"Tolerance": 6
-		},
-		{
-			"Name": "Kolyok",
-			"Nick": "bondy25",
-			"ContractHashrate": 117,
-			"Tolerance": 4
-		},
-		{
-			"Name": "Mitiai",
-			"Nick": "Jensenjjjensen",
-			"ContractHashrate": 97,
-			"Tolerance": 3
-		},
-		{
-			"Name": "Oleg Bakirov",
-			"Nick": "OlegBakirov",
-			"wallet": "0xb4b447a18069f6bd9b3350abebb9bb6eb979101a",
-			"pool": "eth-eu1.nanopool.org:9999",
-			"pass": "BakirovOI@gmail.com",
-			"ContractHashrate": 97,
-			"Tolerance": 3
-		},
-		{
-			"Name": "Sergey Shepelev",
-			"Nick": "molier74",
-			"ContractHashrate": 78,
-			"Tolerance": 3
-		},
-		{
-			"Name": "Mega",
-			"Nick": "gerriebrown",
-			"ContractHashrate": 81,
-			"Tolerance": 3
-		},
-		{
-			"Name": "Albert Halikov",
-			"Nick": "Halk",
-			"ContractHashrate": 39,
-			"Tolerance": 2
-		},
-		{
-			"Name": "Sania Sidorenko",
-			"Nick": "Liluoren",
-			"ContractHashrate": 58,
-			"Tolerance": 2
-		},
-		{
-			"Name": "Denis Sosnovskii",
-			"Nick": "paulroman",
-			"ContractHashrate": 19,
-			"Tolerance": 2
-		},
-		{
-			"Name": "Nikita",
-			"Nick": "WeeDAttack",
-			"ContractHashrate": 12,
-			"Tolerance": 1
-		},
-		{
-			"Name": "Vitalia Harkin",
-			"Nick": "Vitaly2018",
-			"ContractHashrate": 193,
-			"Tolerance": 10
-		},
-		{
-			"Name": "Maksim chudo-fermer",
-			"Nick": "MackUfa",
-			"ContractHashrate": 119,
-			"Tolerance": 4
-		},
-		{
-			"Name": "Pulk",
-			"Nick": "Pulk",
-			"Contract": "Left",
-			"LeftLevel": "0",
-			"LeftPercent": "100",
-			"Tolerance": 1
-		},
-		{
-			"Name": "Electric",
-			"Nick": "pulk2",
-			"Contract": "All",
-			"LeftLevel": "0",
-			"LeftPercent": "100",
-			"Tolerance": 1
-		}
-	],
+   "Settings" : 
+      {
+         "RebootTimers" : [30, 60, 90],
+         "ResetTimers" : [400, 600, 800]
+      },
+   "Rigs" : [
+      {
+         "Name" : "M00",
+         "ip" : "192.168.2.100"
+      },
+      {
+         "Name" : "M01",
+         "ip" : "192.168.2.101"
+      },
+      {
+         "Name" : "M02",
+         "ip" : "192.168.2.102"
+      },
+      {
+         "Name" : "M03",
+         "ip" : "192.168.2.103"
+      },
+      {
+         "Name" : "M04",
+         "ip" : "192.168.2.104"
+      },
+      {
+         "Name" : "M05",
+         "ip" : "192.168.2.105"
+      },
+      {
+         "Name" : "M06",
+         "ip" : "192.168.2.106"
+      },
+      {
+         "Name" : "M07",
+         "ip" : "192.168.2.107"
+      },
+      {
+         "Name" : "M08",
+         "ip" : "192.168.2.108"
+      },
+      {
+         "Name" : "M09",
+         "ip" : "192.168.2.109"
+      },
+      {
+         "Name" : "M10",
+         "ip" : "192.168.2.110"
+      },
+      {
+         "Name" : "M11",
+         "ip" : "192.168.2.111"
+      },
+      {
+         "Name" : "M12",
+         "ip" : "192.168.2.112"
+      },
+      {
+         "Name" : "M13",
+         "ip" : "192.168.2.113"
+      },
+      {
+         "Name" : "M14",
+         "ip" : "192.168.2.114"
+      },
+      {
+         "Name" : "M15",
+         "ip" : "192.168.2.115"
+      },
+      {
+         "Name" : "M16",
+         "ip" : "192.168.2.116"
+      },
+      {
+         "Name" : "M17",
+         "ip" : "192.168.2.117"
+      },
+      {
+         "Name" : "M18",
+         "ip" : "192.168.2.118"
+      },
+      {
+         "Name" : "M19",
+         "ip" : "192.168.2.119"
+      },
+      {
+         "Name" : "M20",
+         "ip" : "192.168.2.120"
+      },
+      {
+         "Name" : "M21",
+         "ip" : "192.168.2.121"
+      },
+      {
+         "Name" : "M22",
+         "ip" : "192.168.2.122"
+      },
+      {
+         "Name" : "M23",
+         "ip" : "192.168.2.123"
+      },
+      {
+         "Name" : "M24",
+         "ip" : "192.168.2.124"
+      },
+      {
+         "Name" : "M25",
+         "ip" : "192.168.2.125"
+      },
+      {
+         "Name" : "M26",
+         "ip" : "192.168.2.126"
+      },
+      {
+         "Name" : "M27",
+         "ip" : "192.168.2.127"
+      },
+      {
+         "Name" : "M28",
+         "ip" : "192.168.2.128"
+      },
+      {
+         "Name" : "M29",
+         "ip" : "192.168.2.129"
+      },
+      {
+         "Name" : "M30",
+         "ip" : "192.168.2.130"
+      },
+      {
+         "Name" : "M31",
+         "ip" : "192.168.2.131"
+      },
+      {
+         "Name" : "M32",
+         "ip" : "192.168.2.132"
+      },
+      {
+         "Name" : "M33",
+         "ip" : "192.168.2.133"
+      },
+      {
+         "Name" : "M34",
+         "ip" : "192.168.2.134"
+      },
+      {
+         "Name" : "M35",
+         "ip" : "192.168.2.135"
+      },
+      {
+         "Name" : "M36",
+         "ip" : "192.168.2.136"
+      },
+      {
+         "Name" : "M37",
+         "ip" : "192.168.2.137"
+      },
+      {
+         "Name" : "M38",
+         "ip" : "192.168.2.138"
+      },
+      {
+         "Name" : "M39",
+         "ip" : "192.168.2.139"
+      },
+      {
+         "Name" : "M40",
+         "ip" : "192.168.2.140"
+      },
+      {
+         "Name" : "M41",
+         "ip" : "192.168.2.141"
+      },
+      {
+         "Name" : "M42",
+         "ip" : "192.168.2.142"
+      },
+      {
+         "Name" : "M43",
+         "ip" : "192.168.2.143"
+      },
+      {
+         "Name" : "M44",
+         "ip" : "192.168.2.144"
+      },
+      {
+         "Name" : "M45",
+         "ip" : "192.168.2.145"
+      },
+      {
+         "Name" : "M46",
+         "ip" : "192.168.2.146"
+      },
+      {
+         "Name" : "M47",
+         "ip" : "192.168.2.147"
+      },
+      {
+         "Name" : "M48",
+         "ip" : "192.168.2.148"
+      },
+      {
+         "Name" : "M49",
+         "ip" : "192.168.2.149"
+      },
+      {
+         "Name" : "M50",
+         "ip" : "192.168.2.150"
+      },
+      {
+         "Name" : "M51",
+         "ip" : "192.168.2.151"
+      },
+      {
+         "Name" : "M52",
+         "ip" : "192.168.2.152"
+      },
+      {
+         "Name" : "M53",
+         "ip" : "192.168.2.153"
+      },
+      {
+         "Name" : "M54",
+         "ip" : "192.168.2.154"
+      },
+      {
+         "Name" : "M55",
+         "ip" : "192.168.2.155"
+      },
+      {
+         "Name" : "M56",
+         "ip" : "192.168.2.156"
+      },
+      {
+         "Name" : "M57",
+         "ip" : "192.168.2.157"
+      },
+      {
+         "Name" : "M58",
+         "ip" : "192.168.2.158"
+      },
+      {
+         "Name" : "M59",
+         "ip" : "192.168.2.159"
+      },
+      {
+         "Name" : "M60",
+         "ip" : "192.168.2.160"
+      },
+      {
+         "Name" : "M61",
+         "ip" : "192.168.2.161"
+      },
+      {
+         "Name" : "M62",
+         "ip" : "192.168.2.162"
+      },
+      {
+         "Name" : "M63",
+         "ip" : "192.168.2.163"
+      },
+      {
+         "Name" : "M64",
+         "ip" : "192.168.2.164"
+      },
+      {
+         "Name" : "M65",
+         "ip" : "192.168.2.165"
+      },
+      {
+         "Name" : "M66",
+         "ip" : "192.168.2.166"
+      },
+      {
+         "Name" : "M67",
+         "ip" : "192.168.2.167"
+      },
+      {
+         "Name" : "M68",
+         "ip" : "192.168.2.168"
+      },
+      {
+         "Name" : "M69",
+         "ip" : "192.168.2.169"
+      },
+      {
+         "Name" : "M70",
+         "ip" : "192.168.2.170"
+      },
+      {
+         "Name" : "M71",
+         "ip" : "192.168.2.171"
+      },
+      {
+         "Name" : "M72",
+         "ip" : "192.168.2.172"
+      },
+      {
+         "Name" : "M73",
+         "ip" : "192.168.2.173"
+      }
+],
+    "Users": [{
+            "Name": "Mama",
+            "Nick": "Nazira",
+            "ContractHashrate": 174,
+            "Tolerance": 10
+        },
+        {
+            "Name": "Serega",
+            "Nick": "Ippolite",
+            "ContractHashrate": 280,
+            "Tolerance": 10
+        },
+        {
+            "Name": "Dinahr",
+            "Nick": "alivareev",
+            "ContractHashrate": 231,
+            "Tolerance": 5
+        },
+        {
+            "Name": "Volosevich Igor",
+            "Nick": "viv",
+            "ContractHashrate": 485,
+            "Tolerance": 5
+        },
+        {
+            "Name": "Azamat Makhmutov",
+            "Nick": "AzamatMakhmutov",
+            "ContractHashrate": 138,
+            "Tolerance": 1
+        },
+        {
+            "Name": "Yura",
+            "Nick": "yuri579",
+            "wallet": "0x9bf48c526280e6657e5b2be4aa480cf0e0c777b4",
+            "pool": "eth-eu1.nanopool.org:9999",
+            "ContractHashrate": 870,
+            "pass": "Moon579@yandex.ru",
+            "Tolerance": 1
+        },
+        {
+            "Name": "Timur Safin",
+            "Nick": "cynical2207",
+            "ContractHashrate": 158,
+            "Tolerance": 3
+        },
+        {
+            "Name": "Gulnaz Saiahova",
+            "Nick": "SayakhovaGF",
+            "ContractHashrate": 78,
+            "Tolerance": 3
+        },
+        {
+            "Name": "Aleksei Fuga",
+            "Nick": "alecsey",
+            "ContractHashrate": 78,
+            "Tolerance": 3
+        },
+        {
+            "Name": "Sania Valikov",
+            "Nick": "funny-grass",
+            "ContractHashrate": 97,
+            "Tolerance": 3
+        },
+        {
+            "Name": "Timur Saifullin",
+            "Nick": "TimSayfullin",
+            "ContractHashrate": 194,
+            "Tolerance": 6
+        },
+        {
+            "Name": "Kolyok",
+            "Nick": "bondy25",
+            "ContractHashrate": 117,
+            "Tolerance": 4
+        },
+        {
+            "Name": "Mitiai",
+            "Nick": "Jensenjjjensen",
+            "ContractHashrate": 97,
+            "Tolerance": 3
+        },
+        {
+            "Name": "Oleg Bakirov",
+            "Nick": "OlegBakirov",
+            "wallet": "0xb4b447a18069f6bd9b3350abebb9bb6eb979101a",
+            "pool": "eth-eu1.nanopool.org:9999",
+            "pass": "BakirovOI@gmail.com",
+            "ContractHashrate": 97,
+            "Tolerance": 3
+        },
+        {
+            "Name": "Sergey Shepelev",
+            "Nick": "molier74",
+            "ContractHashrate": 78,
+            "Tolerance": 3
+        },
+        {
+            "Name": "Mega",
+            "Nick": "gerriebrown",
+            "ContractHashrate": 81,
+            "Tolerance": 3
+        },
+        {
+            "Name": "Albert Halikov",
+            "Nick": "Halk",
+            "ContractHashrate": 39,
+            "Tolerance": 2
+        },
+        {
+            "Name": "Sania Sidorenko",
+            "Nick": "Liluoren",
+            "ContractHashrate": 58,
+            "Tolerance": 2
+        },
+        {
+            "Name": "Denis Sosnovskii",
+            "Nick": "paulroman",
+            "ContractHashrate": 19,
+            "Tolerance": 2
+        },
+        {
+            "Name": "Nikita",
+            "Nick": "WeeDAttack",
+            "ContractHashrate": 12,
+            "Tolerance": 1
+        },
+        {
+            "Name": "Vitalia Harkin",
+            "Nick": "Vitaly2018",
+            "ContractHashrate": 193,
+            "Tolerance": 10
+        },
+        {
+            "Name": "Maksim chudo-fermer",
+            "Nick": "MackUfa",
+            "ContractHashrate": 119,
+            "Tolerance": 4
+        },
+        {
+            "Name": "Pulk",
+            "Nick": "Pulk",
+            "Contract": "Left",
+            "LeftLevel": "0",
+            "LeftPercent": "100",
+            "Tolerance": 1
+        },
+        {
+            "Name": "Electric",
+            "Nick": "pulk2",
+            "Contract": "All",
+            "LeftLevel": "0",
+            "LeftPercent": "100",
+            "Tolerance": 1
+        }
+    ],
    "Workers" : [
       {
          "Hashrate" : 191.6,
@@ -167,12 +470,7 @@
       },
       {
          "Hashrate" : 175.2,
-         "Name" : "M02A",
-         "User" : "pulk2"
-      },
-      {
-         "Hashrate" : 175.2,
-         "Name" : "M02B",
+         "Name" : "M02",
          "User" : "pulk2"
       },
       {
@@ -192,12 +490,7 @@
       },
       {
          "Hashrate" : 22.8,
-         "Name" : "M06A",
-         "User" : "pulk2"
-      },
-      {
-         "Hashrate" : 156.7,
-         "Name" : "M06B",
+         "Name" : "M06",
          "User" : "pulk2"
       },
       {
@@ -207,22 +500,7 @@
       },
       {
          "Hashrate" : 41.3,
-         "Name" : "M08A",
-         "User" : "pulk2"
-      },
-      {
-         "Hashrate" : 41.2,
-         "Name" : "M08B",
-         "User" : "pulk2"
-      },
-      {
-         "Hashrate" : 20.6,
-         "Name" : "M08C",
-         "User" : "pulk2"
-      },
-      {
-         "Hashrate" : 61.9,
-         "Name" : "M08D",
+         "Name" : "M08",
          "User" : "pulk2"
       },
       {
@@ -237,12 +515,7 @@
       },
       {
          "Hashrate" : 98.3,
-         "Name" : "M11A",
-         "User" : "pulk2"
-      },
-      {
-         "Hashrate" : 44.4,
-         "Name" : "M11B",
+         "Name" : "M11",
          "User" : "pulk2"
       },
       {
@@ -307,12 +580,7 @@
       },
       {
          "Hashrate" : 64,
-         "Name" : "M26A",
-         "User" : "pulk2"
-      },
-      {
-         "Hashrate" : 110.9,
-         "Name" : "M26B",
+         "Name" : "M26",
          "User" : "pulk2"
       },
       {
@@ -363,7 +631,7 @@
       {
          "Hashrate" : 130.3,
          "Name" : "M36",
-         "User" : "Ippolite"
+         "User" : "pulk2"
       },
       {
          "Hashrate" : 130.3,
@@ -417,42 +685,7 @@
       },
       {
          "Hashrate" : 71.3,
-         "Name" : "M48A",
-         "User" : "pulk2"
-      },
-      {
-         "Hashrate" : 71.3,
-         "Name" : "M48B",
-         "User" : "pulk2"
-      },
-      {
-         "Hashrate" : 71.3,
-         "Name" : "M48C",
-         "User" : "pulk2"
-      },
-      {
-         "Hashrate" : 71.3,
-         "Name" : "M48D",
-         "User" : "pulk2"
-      },
-      {
-         "Hashrate" : 71.3,
-         "Name" : "M48E",
-         "User" : "pulk2"
-      },
-      {
-         "Hashrate" : 71.3,
-         "Name" : "M48F",
-         "User" : "pulk2"
-      },
-      {
-         "Hashrate" : 71.3,
-         "Name" : "M48G",
-         "User" : "pulk2"
-      },
-      {
-         "Hashrate" : 71.3,
-         "Name" : "M48H",
+         "Name" : "M48",
          "User" : "pulk2"
       },
       {
@@ -463,7 +696,7 @@
       {
          "Hashrate" : 132.9,
          "Name" : "M50",
-         "User" : "Ippolite"
+         "User" : "pulk2"
       },
       {
          "Hashrate" : 193.6,
@@ -477,12 +710,7 @@
       },
       {
          "Hashrate" : 88,
-         "Name" : "M53A",
-         "User" : "pulk2"
-      },
-      {
-         "Hashrate" : 88,
-         "Name" : "M53B",
+         "Name" : "M53",
          "User" : "pulk2"
       },
       {
@@ -542,12 +770,7 @@
       },
       {
          "Hashrate" : 87.2,
-         "Name" : "M66A",
-         "User" : "pulk2"
-      },
-      {
-         "Hashrate" : 87.2,
-         "Name" : "M66B",
+         "Name" : "M66",
          "User" : "pulk2"
       },
       {
@@ -579,6 +802,11 @@
          "Hashrate" : 87.2,
          "Name" : "M73",
          "User" : "pulk2"
+      },
+      {
+         "Hashrate" : 87.2,
+         "Name" : "M74",
+         "User" : "pulk2"
       }
-	]
+    ]
 }

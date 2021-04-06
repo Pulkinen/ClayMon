@@ -1,6 +1,8 @@
 from datetime import datetime
 from datetime import timedelta
 import farm_stat_API
+import numpy as np
+import pandas as pd
 # -Читаем файлик дейли-репорт, определяем последнюю дату
 # -С этой даты по 0:00 текущей даты делаем запрос хешрейта
 # -читаем файлик блекаутов
@@ -103,15 +105,109 @@ def evalute_daily_hashrate(first_date, last_date, stat, blackouts):
     return rez
 
 
+def evalute_daily_hashrate_from_pandas_stat(first_date, last_date, pandas_stat, blackouts):
+    dayz = (last_date - first_date).days
+    recs = [dict(hrs=0, mindt=None, maxdt=None, blacks=0, snapcnt=0) for i in range(dayz)]
+    df = pandas_stat[['dt', 'hashrate']].groupby('dt').agg({'hashrate':np.sum, 'dt':np.max})
+    df_date_time = df.dt.apply(datetime.fromtimestamp)
+    df['dayz'] = df_date_time.apply(datetime.date)
+    df = df[(df.dayz>=first_date.date()) & (df.dayz<=last_date.date())]
+    df2 = df.groupby('dayz').agg({'hashrate':[np.sum, np.mean], 'dt':np.size})
+    df2.columns = ["_".join(x) for x in df2.columns.ravel()]
+    print(df2.columns)
+    df2['avg_hr']=df2.hashrate_sum/8640/1000
+    df2['avg_hr2']=df2.hashrate_mean/1000
+    df2.index = range(len(df2))
+    rez = []
+    for idx in df2.index:
+        # Если вдруг случится блекаут с переходом через полночь - считать будет неправильно
+        rez.append((first_date + idx*one_day, df2.avg_hr[idx], df2.avg_hr2[idx], df2.dt_size[idx]))
+    return rez
+
+def evalute_daily_hashrate_from_pandas_stats(first_date, pandas_stats):
+    if pandas_stats is None or len(pandas_stats)==0:
+        return []
+    last_date = first_date + timedelta(days = 1)
+    ts1 = int(first_date.timestamp())
+    ts2 = int(last_date.timestamp())
+    fstats = []
+    for stat in pandas_stats:
+        if stat is None:
+            continue
+        mask = (stat.dt >= ts1) & (stat.dt < ts2)
+        fstat = stat[['dt', 'hashrate', 'uptime_id']][mask]
+        fstats += [fstat]
+
+
+    df = pd.concat(fstats)
+    df = df.groupby('dt').agg({'hashrate':np.sum, 'dt':np.max, 'uptime_id':np.max})
+    df_date_time = df.dt.apply(datetime.fromtimestamp)
+    df['dayz'] = df_date_time.apply(datetime.date)
+    df = df[(df.dayz>=first_date.date()) & (df.dayz<=last_date.date())]
+
+    df_uptimes = df.groupby('uptime_id').agg({'dt':[np.min, np.max]})
+    df_uptimes.columns = ["_".join(x) for x in df_uptimes.columns.ravel()]
+    changes = list(df_uptimes.sort_values(by=['dt_amin']).values.ravel())
+    changes = [ts1] + changes + [ts2]
+    downtimes =  [((a-ts1)/3600, (b-ts1)/3600) for a,b in zip(changes[::2], changes[1::2]) if a < b]
+
+    df2 = df.groupby('dayz').agg({'hashrate':[np.sum, np.mean], 'dt':np.size})
+    df2.columns = ["_".join(x) for x in df2.columns.ravel()]
+    df2['avg_hr']=df2.hashrate_sum/8640/1000
+    df2['avg_hr2']=df2.hashrate_mean/1000
+    df2.index = range(len(df2))
+
+    # df = df.groupby('dt').agg({'hashrate':np.sum, 'dt':np.max})
+    # df_date_time = df.dt.apply(datetime.fromtimestamp)
+    # df['dayz'] = df_date_time.apply(datetime.date)
+    # df = df[(df.dayz>=first_date.date()) & (df.dayz<=last_date.date())]
+    # df2 = df.groupby('dayz').agg({'hashrate':[np.sum, np.mean], 'dt':np.size})
+    # df2.columns = ["_".join(x) for x in df2.columns.ravel()]
+    # df2['avg_hr']=df2.hashrate_sum/8640/1000
+    # df2['avg_hr2']=df2.hashrate_mean/1000
+    # df2.index = range(len(df2))
+
+    sl = [f'{a:.4f}-{b:.4f}' for a,b in downtimes]
+    dwn_str = '[' + '; '.join(sl) + ']'
+
+    rez = []
+    for idx in df2.index:
+        # Если вдруг случится блекаут с переходом через полночь - считать будет неправильно
+        rez.append((first_date + idx*one_day, df2.avg_hr[idx], df2.avg_hr2[idx], df2.dt_size[idx], dwn_str))
+    print(rez)
+    return rez
+
+
 first_date = get_new_reports_start_date()
 dt = datetime.now()
 last_date = datetime(dt.year, dt.month, dt.day)
-hashrate_stat = farm_stat_API.api_gimme_farm_stat(first_date, last_date)
+# hashrate_stat.to_csv('tmp.csv')
+# hashrate_stat = pd.read_csv('tmp.csv')
 blackouts = get_blackouts()
-daily_hashrates = evalute_daily_hashrate(first_date, last_date, hashrate_stat, blackouts)
+dayz = (last_date - first_date).days
+daily_hashrates = []
+
+stats = farm_stat_API.api_gimme_farm_stat(first_date, last_date)
+
+# for d in range(0, dayz, 2):
+#     print(f'{d}/{dayz}')
+#     d1 = first_date + timedelta(days=d)
+#     d2 = first_date + timedelta(days=d+2)
+#     stat = farm_stat_API.api_gimme_farm_stat(d1, d2)
+#     if stat is not None:
+#         stats += stat
+
+for d in range(dayz):
+    d1 = first_date + timedelta(days=d)
+    daily_hashrates += evalute_daily_hashrate_from_pandas_stats(d1, stats)
+
 f = open(dr_filename, 'a')
 lines = []
+def any_to_str(x):
+    if isinstance(x, float): return f'{x:.3f}'
+    return str(x)
+
 for dh in daily_hashrates:
-    lines += ';'.join(map(str, dh))+'\n'
+    lines += ';'.join(map(any_to_str, dh))+'\n'
 f.writelines(lines)
 f.close()

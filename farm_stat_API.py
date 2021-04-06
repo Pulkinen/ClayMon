@@ -1,4 +1,6 @@
 import zipstat
+cache_folder = 'E:\sandbox\log-cache'
+logs_dir='e:\sandbox\logs'
 
 def api_gimme_farm_hashrate(start, stop, effective_only = True):
     return zipstat.gimme_farm_hashrate(start, stop, effective_only)
