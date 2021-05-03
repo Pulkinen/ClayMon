@@ -38,11 +38,11 @@
 	],
 
 	"Workers": [{
-			"Hashrate": 185.4,
+			"Hashrate": 244.4,
 			"Name": "M04"
 		},
 		{
-			"Hashrate": 221.1,
+			"Hashrate": 158.1,
 			"Name": "M13"
 		},
 		{
@@ -50,15 +50,15 @@
 			"Name": "M18"
 		},
 		{
-			"Hashrate": 241.5,
+			"Hashrate": 154.5,
 			"Name": "M28"
 		},
 		{
-			"Hashrate": 184.3,
+			"Hashrate": 107.3,
 			"Name": "M37"
 		},
 		{
-			"Hashrate": 250.1,
+			"Hashrate": 186.1,
 			"Name": "M38"  
 		},
 		{
@@ -66,23 +66,23 @@
 			"Name": "M42"
 		},
 		{
-			"Hashrate": 221.09,
+			"Hashrate": 210.09,
 			"Name": "M50"
 		},
 		{
-			"Hashrate": 186.6,
+			"Hashrate": 182.6,
 			"Name": "M51"
 		},
 		{
-			"Hashrate": 217.6,
+			"Hashrate": 248.6,
 			"Name": "M52"
 		},
 		{
-			"Hashrate": 253.7,
+			"Hashrate": 223.7,
 			"Name": "M56"
 		},
 		{
-			"Hashrate": 161.2,
+			"Hashrate": 174.2,
 			"Name": "M60"
 		},
 		{
@@ -90,19 +90,19 @@
 			"Name": "M64"
 		},
 		{
-			"Hashrate": 221.2,
+			"Hashrate": 217.2,
 			"Name": "M65"
 		},
 		{
-			"Hashrate": 222.2,
+			"Hashrate": 220.2,
 			"Name": "M69"
 		},
 		{
-			"Hashrate": 196.4,
+			"Hashrate": 185.4,
 			"Name": "M70"
 		},
 		{
-			"Hashrate": 180.7,
+			"Hashrate": 153.7,
 			"Name": "M71"
 		},
 
@@ -110,7 +110,7 @@
 
 
 		{
-			"Hashrate": 116.2,
+			"Hashrate": 88.2,
 			"Name": "M00"
 		},
 		{
@@ -118,7 +118,7 @@
 			"Name": "M01"
 		},
 		{
-			"Hashrate": 151.2,
+			"Hashrate": 146.2,
 			"Name": "M02"
 		},
 		{
@@ -126,11 +126,11 @@
 			"Name": "M03"
 		},
 		{
-			"Hashrate": 227.1,
+			"Hashrate": 174.1,
 			"Name": "M05"
 		},
 		{
-			"Hashrate": 172.5,
+			"Hashrate": 163.5,
 			"Name": "M06"
 		},
 		{
@@ -162,15 +162,15 @@
 			"Name": "M15"
 		},
 		{
-			"Hashrate": 121.1,
+			"Hashrate": 130.1,
 			"Name": "M16"
 		},
 		{
-			"Hashrate": 169.1,
+			"Hashrate": 0.1,
 			"Name": "M17"
 		},
 		{
-			"Hashrate": 68.4,
+			"Hashrate": 98.4,
 			"Name": "M19"
 		},
 		{
@@ -178,7 +178,7 @@
 			"Name": "M20"
 		},
 		{
-			"Hashrate": 177.5,
+			"Hashrate": 144.5,
 			"Name": "M21"
 		},
 		{
@@ -186,11 +186,11 @@
 			"Name": "M23"
 		},
 		{
-			"Hashrate": 134.2,
+			"Hashrate": 164.2,
 			"Name": "M24"
 		},
 		{
-			"Hashrate": 80.8,
+			"Hashrate": 48.8,
 			"Name": "M25"
 		},
 		{
@@ -202,19 +202,19 @@
 			"Name": "M27"
 		},
 		{
-			"Hashrate": 168.8,
+			"Hashrate": 143.8,
 			"Name": "M29"
 		},
 		{
-			"Hashrate": 139.7,
+			"Hashrate": 166.7,
 			"Name": "M30"
 		},
 		{
-			"Hashrate": 138.9,
+			"Hashrate": 90.9,
 			"Name": "M31"
 		},
 		{
-			"Hashrate": 211.5,
+			"Hashrate": 186.5,
 			"Name": "M32"
 		},
 		{
@@ -230,7 +230,7 @@
 			"Name": "M35"
 		},
 		{
-			"Hashrate": 135.7,
+			"Hashrate": 130.7,
 			"Name": "M36"
 		},
 
@@ -248,15 +248,15 @@
 			"Name": "M41"
 		},
 		{
-			"Hashrate": 142.1,
+			"Hashrate": 173.1,
 			"Name": "M44"
 		},
 		{
-			"Hashrate": 96.8,
+			"Hashrate": 163.8,
 			"Name": "M45"
 		},
 		{
-			"Hashrate": 170.5,
+			"Hashrate": 160.5,
 			"Name": "M46"
 		},
 		{
@@ -268,7 +268,7 @@
 			"Name": "M48"
 		},
 		{
-			"Hashrate": 86.2,
+			"Hashrate": 55.2,
 			"Name": "M49"
 		},
 
@@ -277,19 +277,19 @@
 			"Name": "M53"
 		},
 		{
-			"Hashrate": 137.8,
+			"Hashrate": 81.8,
 			"Name": "M54"
 		},
 		{
-			"Hashrate": 122.8,
+			"Hashrate": 126.8,
 			"Name": "M55"
 		},
 		{
-			"Hashrate": 183.2,
+			"Hashrate": 147.2,
 			"Name": "M58"
 		},
 		{
-			"Hashrate": 218.2,
+			"Hashrate": 213.2,
 			"Name": "M59"
 		},
 		{
@@ -301,15 +301,15 @@
 			"Name": "M62"
 		},
 		{
-			"Hashrate": 130.2,
+			"Hashrate": 74.2,
 			"Name": "M63"
 		},
 		{
-			"Hashrate": 61.2,
+			"Hashrate": 73.2,
 			"Name": "M66"
 		},
 		{
-			"Hashrate": 170.8,
+			"Hashrate": 141.8,
 			"Name": "M68"
 		},
 		{
