@@ -1,0 +1,1 @@
+start python config-script.py -c contracts-to-users.json -w contracts-workers.json

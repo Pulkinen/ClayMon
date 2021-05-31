@@ -1,5 +1,6 @@
 import os, json
 import hashrate_aligner as aligner
+import argparse
 
 
 def build_gpu_list(base_folder):
@@ -390,17 +391,33 @@ def build_configs_for_lolminer_etc(base_folder, res_folder, users, eth_workers, 
 
 
 if __name__ == '__main__':
-    base_folder = "Y:\\_Майнинг\\Autoupdate\\Config\\"
-    res_folder = "Y:\\_Майнинг\\Config_test\\"
-    contracts_filename = 'contracts-to-electric.json'
-    # contracts_filename = 'contracts-to-users.json'
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-b", "--baseFolder", type=str, required=False, help="Folder to get base configs", default="Y:\\_Майнинг\\Autoupdate\\Config\\")
+    parser.add_argument("-r", "--resFolder", type=str, required=False, help="Folder to put new configs", default="Y:\\_Майнинг\\Config_test\\")
+    parser.add_argument("-c", "--contracts", type=str, required=True, help="Json file with contracts")
+    parser.add_argument("-w", "--workers", type=str, required=False, help="Json file with workers")
+    args = parser.parse_args()
 
+    base_folder = args.baseFolder
+    res_folder = args.resFolder
+    # contracts_filename = 'contracts-to-users.json'
+    contracts_filename = args.contracts
     f2 = open(contracts_filename, 'r')
     st2 = f2.read()
     f2.close()
     data = json.loads(st2)
     usrs = data["Users"]
     eth_ws = data["ETH_Workers"]
+
+
+    # hashrates_filename = 'contracts-workers.json'
+    workers_filename = args.workers
+    f3 = open(workers_filename, 'r')
+    st3 = f3.read()
+    f3.close()
+    data = json.loads(st3)
     all_ws = data["Workers"]
 
     build_configs_for_lolminer_etc(base_folder, res_folder, usrs, eth_ws, all_ws)
+
+    s=input()
