@@ -18,6 +18,9 @@ def build_gpu_list(base_folder):
         print(folder[-7:], file=out_file2, end=' ')
 #        print(mn_str)
         for fname in files:
+            gpu_file_name = f'M{mn_str}-GPU.txt'
+            if fname.upper() != gpu_file_name.upper():
+                continue
             f = open(folder+'\\'+fname, 'r')
             st = f.readlines()
             f.close()
