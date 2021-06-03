@@ -148,8 +148,8 @@
 	}, {
 		"Name": "Pulk",
 		"Nick": "pulk",
-		"EthHashrate": 550,
-		"ContractHashrate": 5000,
+		"EthHashrate": 350,
+		"ContractHashrate": 5200,
 		"etc_wallet": "0xbd772c8772d38dbf407567ef5e780bd92b038dbe",
 		"etc_pool": "etc.2miners.com:1010",
 		"eth_wallet": "0xf82b87c659dcef48cf988e32d0c4f1451c75a9be",
@@ -170,13 +170,13 @@
 		"Nick": "pulk2d",
 		"eth_wallet": "0x78477b0053f2fafd1abad59d146b26e3fc4c2168",
 		"eth_pool": "eth.2miners.com:2020",
-		"etc_wallet": "0xf6d53d86626b4371ae324004eb7b495813e691ca",
+		"etc_wallet": "0x78477b0053f2fafd1abad59d146b26e3fc4c2168",
 		"etc_pool": "etc.2miners.com:1010",
 		"ContractHashrate": 600,
 		"EthHashrate": 300,
 		"Tolerance": 1
 	}],
-	"ETH_Workers": ["M18", "M37", "M51", "M60", "M62", "M70", "M71",
+	"ETH_Workers": ["M18", "M37", "M60", "M70", "M71",
 		"M04", "M13", "M28", "M38", "M42", "M50", "M56", "M65", "M69",
 		"M52"
 	]
