@@ -44,26 +44,34 @@ def CheckConfigs(wrks):
         try:
             sock.connect((ip, port))
             sock.send(buff.encode('utf-8'))
-            data = sock.recv(5000)
+            data = b''
+            while True:
+                rcv = sock.recv(1000)
+                if not rcv:
+                    break
+                data += rcv
         except socket.error as msg:
+            # print(msg)
             sock.close()
             sock = None
+            print(wname, msg)
             continue
         udata = data.decode("utf-8")
+        ttt = ''
         try:
             resp = json.loads(udata)
             rez = resp["result"]
-            conf = bytearray.fromhex(rez[1]).decode().split()
+            ttt = bytearray.fromhex(rez[1])
+            conf = ttt.decode('cp1251').split()
             i1 = conf.index("-ewal")
             i2 = conf.index("-epool")
-        except:
-            print("udata = ", udata)
+        except Exception as e:
+            print(wname, e, ttt)
             continue
         try:
             i3 = conf.index("-eworker")
         except:
             i3 = -1
-            print(i3)
         if i3 >= 0:
             print(wname, "ewal =", conf[i1+1], "epool =", conf[i2+1], "eworker =", conf[i3+1])
         else:

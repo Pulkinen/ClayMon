@@ -29,12 +29,13 @@ def zip_whole_dir(config):
             print(folder, subfolders, files)
             for fn in files:
                 src_fname = '%s/%s'%(folder, fn)
-                zipname = dst_dir + '/' + os.path.split(folder)[1]
                 z.write(src_fname)
         except Exception as e:
             print('Exception:', e)
     z.close()
-
+    proceed_dst_files = ['%s.zip' % zipname]
+    rez = dict(zip(proceed_dst_files, [None]*len(proceed_dst_files)))
+    return(list(rez.keys()))
 
 def replicate_item(config):
     accum_src_size = 0
@@ -177,6 +178,102 @@ def process_clean_command(config):
     except Exception as e:
         print('Exception:', e)
 
+def repair_folder_name(folder):
+    rez = folder
+    # good_slash = chr(92)
+    good_slash = '/'
+    bad_slash = '\\'
+    rez = rez.replace(bad_slash, good_slash)
+    bad_slash = '//'
+    rez = rez.replace(bad_slash, good_slash)
+    return rez
+
+def get_folder_files_list(dir):
+    rez = []
+    try:
+        tree = os.walk(dir)
+        for folder, subfolders, files in tree:
+            for f in files:
+                fname = repair_folder_name(folder + '/' + f)
+                stat = os.stat(fname)
+                size = stat.st_size
+                mtime = stat.st_mtime
+                rez.append((fname, size, mtime))
+    except Exception as e:
+        print('Exception:', e)
+    return rez
+
+def filter_too_old_files_from_list(flist, days):
+    SCE = time.time()
+    too_old_range = SCE - 86400*days
+    return list(filter(lambda x: x[2] >= too_old_range, flist))
+
+def cut_disk_name(fname):
+    return fname[3:]
+
+def filter_also_existing_files(src_files, dst_files):
+    dst = {}
+    for fname, size, mtime in dst_files:
+        key = cut_disk_name(fname), size
+        dst[key] = None
+
+    rez = []
+    for item in src_files:
+        fname, size, mtime = item
+        key = cut_disk_name(fname), size
+        if not key in dst:
+            rez.append(item)
+
+    return rez
+
+def get_files_accum_size(file_list):
+    rez_size = 0
+    for fname, size, mtime in file_list:
+        rez_size += size
+    return rez_size
+
+def select_oldest_files_adjust_size_to(file_list, size_to_delete):
+    del_list = [fl for fl in file_list if not 'stat' in fl[0].lower()]
+    srtd_files = sorted(del_list, key=lambda itm: itm[2])
+    accum_size = 0
+    todelete = []
+    for itm in srtd_files:
+        accum_size += itm[1]
+        todelete.append(itm)
+        if accum_size > size_to_delete:
+            break
+    return todelete
+
+def copy_em_all_to_disk_O(config):
+    print('process copy_em_all_to_disk_O command')
+    dst_dir = config['DstDir']
+    src_dir = config['SrcDir']
+    diskO_max_size = config['DiskOMaxSizeMb']
+
+    src_files_0 = get_folder_files_list(src_dir)
+    src_files_1 = filter_too_old_files_from_list(src_files_0, 30)
+    dst_files = get_folder_files_list(dst_dir)
+    src_files_2 = filter_also_existing_files(src_files_1, dst_files)
+
+    dst_size = get_files_accum_size(dst_files)
+    to_copy_size = get_files_accum_size(src_files_2)
+
+    if dst_size + to_copy_size > diskO_max_size*1024*1024: # We have to delete some files, to free some space
+        size_to_delete = dst_size + to_copy_size - diskO_max_size*1024*1024
+        to_delete_files = select_oldest_files_adjust_size_to(dst_files, size_to_delete)
+        for fname, size, mtime in to_delete_files:
+            os.remove(fname)
+
+    for fname, size, mtime in src_files_2:
+        dst_fname = 'O:/' + cut_disk_name(fname)
+        path1, ttttt = os.path.split(dst_fname)
+        path2, ttttt = os.path.split(path1)
+        if not os.path.isdir(path2):
+            os.mkdir(path2)
+        if not os.path.isdir(path1):
+            os.mkdir(path1)
+        copyfile(fname, dst_fname)
+        print(fname, '---->', dst_fname)
 
 def process_item(config):
     global last_proceed_files
@@ -186,19 +283,25 @@ def process_item(config):
     elif command == 'Clean':
         process_clean_command(config)
     elif command == 'ZipFolder':
-        zip_whole_dir(config)
+        last_proceed_files = zip_whole_dir(config)
+    elif command == 'CopyEmAllToDiskO':
+        copy_em_all_to_disk_O(config)
     else:
         print('Unknown command in config: %s'%command)
 
+try:
+    f = open('replicate-config.txt', 'r')
+    st = f.read()
+    conf = json.loads(st)
+    f.close()
+    while True:
+        last_proceed_files = []
+        conf_items = conf['Items']
+        for item in conf_items:
+            process_item(item)
+        print('Lawfully sleep until ', datetime.now()+timedelta(seconds=1500))
+        time.sleep(1500)
+except Exception as e:
+    print(e)
+    s = input()
 
-f = open('replicate-config.txt', 'r')
-st = f.read()
-conf = json.loads(st)
-f.close()
-while True:
-    last_proceed_files = []
-    conf_items = conf['Items']
-    for item in conf_items:
-        process_item(item)
-    print('Lawfully sleep until ', datetime.now()+timedelta(seconds=900))
-    time.sleep(900)
