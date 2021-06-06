@@ -2,6 +2,7 @@ import urllib.request
 import json
 import threading
 import socket
+import os
 
 # miner_url = "http://192.168.0.20:3333/stat"
 miner_url = "http://127.0.0.1:4444/stat"
@@ -161,6 +162,8 @@ def give_stat(event_for_wait, event_for_set):
                     responce = make_stat1(last_stat)
                 elif packet["method"] == "miner_getstat2":
                     responce = make_stat2(last_stat)
+                elif packet["method"] in ("miner_restart", "miner_reboot"):
+                    os.system("shutdown /r /f /t 1")
                 else:
                     responce = {'{EQ': -1}
                 buff = json.dumps(responce)
