@@ -3,6 +3,7 @@ import json
 import threading
 import socket
 from itertools import chain
+import os
 
 gminer_url = "http://127.0.0.1:4444/stat"
 lolminer_url = "http://127.0.0.1:4444/summary"
@@ -227,6 +228,8 @@ def give_stat(event_for_wait, event_for_set):
                     responce = lolminer_make_stat1(last_stat)
                 elif packet["method"] == "miner_getstat2":
                     responce = lolminer_make_stat2(last_stat)
+                elif packet["method"] in ("miner_restart", "miner_reboot"):
+                    os.system("shutdown /r /f /t 1")
                 else:
                     responce = {'{EQ': -1}
                 buff = json.dumps(responce)
