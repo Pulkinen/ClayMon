@@ -16,7 +16,7 @@ HaveToExit = False
 
 uptime_id = random.randint(0, 10000000)
 server_start_time_str = datetime.strftime(datetime.now(), '%Y-%m-%d %H-%M-%S')
-
+log_filename = f'claymonlog/claymonlog {server_start_time_str}.txt'
 
 def printDbg(verbosity, *args):
     if verbosity <= maxVerbosity:
@@ -28,7 +28,7 @@ def printDbg(verbosity, *args):
             print(arg, end=" ")
         print()
         try:
-            f = open('claymonlog.txt', 'a')
+            f = open(log_filename, 'a')
             print(tstamp, sep = " ", end =  " ", file = f, flush = False)
             for arg in args:
                 print(arg, sep = " ", end = " ", file = f, flush = False)
