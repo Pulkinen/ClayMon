@@ -17,6 +17,7 @@ Stopped = False
 wd_ip = '192.168.2.55'
 wd_port = 7850
 dbRigs = {}
+GlobalUptime = 0
 
 log_suffix = datetime.strftime(datetime.now(), "%Y-%m-%d %H-%M-%S")
 wdlog_fname = 'wdlog\wdlog\watchdoglog %s.txt' % log_suffix
@@ -374,12 +375,18 @@ def delayThr( event_for_wait, event_for_set):
     sock.bind(("", 6116))
     sock.listen(1)
 
-    global HaveToExit
+    global HaveToExit, GlobalUptime, wdlog_fname
     while not HaveToExit:
         printDbg(vrbDbg, datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"), "Delay 1")
         event_for_wait.wait()
         event_for_wait.clear()
         printDbg(vrbDbg, datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"), "Delay 2")
+
+        GlobalUptime += pollPeriod
+        if (GlobalUptime - pollPeriod)%86400 != GlobalUptime%86400 and GlobalUptime%86400 > 0:
+            log_suffix = datetime.strftime(datetime.now(), "%Y-%m-%d %H-%M-%S")
+            wdlog_fname = 'wdlog\wdlog\watchdoglog %s.txt' % log_suffix
+
         sock.settimeout(pollPeriod)
         data = None
         try:
