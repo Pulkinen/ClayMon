@@ -383,7 +383,9 @@ def delayThr( event_for_wait, event_for_set):
         printDbg(vrbDbg, datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"), "Delay 2")
 
         GlobalUptime += pollPeriod
-        if (GlobalUptime - pollPeriod)%86400 != GlobalUptime%86400 and GlobalUptime%86400 > 0:
+        days = GlobalUptime // 86400
+        prev_days = (GlobalUptime - pollPeriod) // 86400
+        if days != prev_days and days > 0:
             log_suffix = datetime.strftime(datetime.now(), "%Y-%m-%d %H-%M-%S")
             wdlog_fname = 'wdlog\wdlog\watchdoglog %s.txt' % log_suffix
 
