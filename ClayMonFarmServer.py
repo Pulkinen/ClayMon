@@ -16,7 +16,7 @@ HaveToExit = False
 
 uptime_id = random.randint(0, 10000000)
 server_start_time_str = datetime.strftime(datetime.now(), '%Y-%m-%d %H-%M-%S')
-log_filename = f'claymonlog/claymonlog {server_start_time_str[:-3]}.txt'
+log_filename = f'claymonlog/claymonlog/claymonlog {server_start_time_str[:-3]}.txt'
 
 def printDbg(verbosity, *args):
     if verbosity <= maxVerbosity:
@@ -668,7 +668,7 @@ def delayThr( event_for_wait, event_for_set):
         prev_days = (GlobalUptime - pollPeriod) // 86400
         if days != prev_days and days > 0:
             time_str = datetime.strftime(datetime.now(), '%Y-%m-%d %H-%M')
-            log_filename = f'claymonlog/claymonlog {time_str}.txt'
+            log_filename = f'claymonlog/claymonlog/claymonlog {time_str}.txt'
 
         sock.settimeout(pollPeriod)
         try:
