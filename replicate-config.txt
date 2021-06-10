@@ -1,13 +1,5 @@
 {
-    "Items": [{
-            "Comment": "Clean old log zips at O:",
-            "Command": "Clean",
-            "DstDir": "O:/Logs/",
-            "DateLevel": 1,
-            "TargetSizeMb": 7300,
-            "EraseAfterCopy": 0
-        },
-
+    "Items": [
 {
             "Comment": "Zip and move miner logs to F:",
             "Command": "ZipCopyMove",
@@ -19,18 +11,6 @@
             "DateLevel": 1,
             "EraseAfterCopy": 1
         },
-        {
-            "Comment": "Copy new log zips to O:",
-            "Command": "ZipCopyMove",
-            "SrcFilter": "Last proceed files",
-            "SrcDir": "F:/Logs/",
-            "DstDir": "O:/Logs/",
-            "CopyDirsStruct": 1,
-            "Zip": 0,
-            "OneZip": 0,
-            "DateLevel": 0,
-            "EraseAfterCopy": 0
-        },
     {
             "Comment": "Zip watchdog log to F:",
             "Command": "ZipCopyMove",
@@ -40,19 +20,18 @@
             "Zip": 1,
             "OneZip": 1,
             "DateLevel": 1,
-            "EraseAfterCopy": 0
+            "EraseAfterCopy": 1
         },
-        {
-            "Comment": "Copy new log zips to O:",
+    {
+            "Comment": "Zip claymon log to F:",
             "Command": "ZipCopyMove",
-            "SrcFilter": "Last proceed files",
-            "SrcDir": "F:/Logs/",
-            "DstDir": "O:/Logs/",
+            "SrcDir": "U:/Claymon/claymonlog/",
+            "DstDir": "F:/Logs/",
             "CopyDirsStruct": 1,
-            "Zip": 0,
-            "OneZip": 0,
-            "DateLevel": 0,
-            "EraseAfterCopy": 0
+            "Zip": 1,
+            "OneZip": 1,
+            "DateLevel": 1,
+            "EraseAfterCopy": 1
         },
     {
             "Comment": "Zip configs to F:",
@@ -62,18 +41,6 @@
             "AppendDatetimeToName": 1,
             "Zip": 1,
             "OneZip": 1,
-            "EraseAfterCopy": 0
-        },
-        {
-            "Comment": "Copy new log zips to O:",
-            "Command": "ZipCopyMove",
-            "SrcFilter": "Last proceed files",
-            "SrcDir": "F:/Logs/",
-            "DstDir": "O:/Logs/",
-            "CopyDirsStruct": 1,
-            "Zip": 0,
-            "OneZip": 0,
-            "DateLevel": 0,
             "EraseAfterCopy": 0
         }
     ]
