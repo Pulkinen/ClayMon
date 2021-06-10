@@ -112,8 +112,7 @@
 		"Tolerance": 3
 	}, {
 		"Name": "Albert Halikov",
-		"ContractHashrateNorm": 39,
-		"ContractHashrate": 160,
+		"ContractHashrate": 39,
 		"Nick": "Halk",
 		"etc_pool": "europe.etchash-hub.miningpoolhub.com:20615",
 		"Tolerance": 2
@@ -125,8 +124,7 @@
 	}, {
 		"Name": "Denis Sosnovskii",
 		"Nick": "paulroman",
-		"ContractHashrateNorm": 19,
-		"ContractHashrate": 80,
+		"ContractHashrate": 19,
 		"etc_pool": "europe.etchash-hub.miningpoolhub.com:20615",
 		"Tolerance": 2
 	}, {
